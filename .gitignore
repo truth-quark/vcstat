@@ -1,3 +1,6 @@
+# General
+*~
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -113,6 +116,9 @@ venv.bak/
 # Spyder project settings
 .spyderproject
 .spyproject
+
+# IntelliJ IDEs
+.idea/
 
 # Rope project settings
 .ropeproject
