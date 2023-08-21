@@ -52,6 +52,10 @@ def print_git_status(repo_path,
             print(pad * ' ', tmp)
 
 
+def _basename_lower(term: str):
+    return os.path.basename(term).lower()
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Show git status for multiple repositories")
     parser.add_argument("dirs", default=[os.getcwd()], nargs='+',
@@ -75,7 +79,7 @@ if __name__ == "__main__":
         print('Git:')
         longest = max([len(os.path.basename(e)) for e in git_projects])
 
-        for proj in sorted(git_projects):
+        for proj in sorted(git_projects, key=_basename_lower):
             padding = DEFAULT_PADDING if args.status else longest
             print_git_status(proj, padding, args.status, args.dirty_only)
     else:
