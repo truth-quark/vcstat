@@ -18,11 +18,19 @@ DEFAULT_PADDING = 2
 
 # FIXME: change this to format_status() & return a string for printing
 # TODO: add bash colours to status output?
+# TODO: add flag to ignore untracked files?
 def print_git_status(repo_path,
                      padding_size=0,
                      show_git_status=False,
                      show_dirty_only=False):
-    """TODO"""
+    """
+    Prints Git repository status to `stdout`.
+
+    @param repo_path: path to root dir of Git repository
+    @param padding_size: number of spaces to indent the repository name
+    @param show_git_status: True to list all modified and untracked files
+    @param show_dirty_only: True prevents display of unmodified repositories
+    """
     show_clean_repo = not show_dirty_only  # reverse flag for readability
     base_name = os.path.basename(repo_path)
     repo = Repo(repo_path)
