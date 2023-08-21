@@ -13,6 +13,7 @@ DIRTY = f'{RED}dirty\033{DEFAULT}'
 CLEAN = f'{GREEN}clean\033{DEFAULT}'
 
 STATUS_TEMPLATE = '\033[1;37m{path}\033[0m ({dirty}) \033[0;33m{branch}\033[0m'
+DEFAULT_PADDING = 2
 
 
 # FIXME: change this to format_status() & return a string for printing
@@ -74,7 +75,8 @@ if __name__ == "__main__":
         print('Git:')
         longest = max([len(os.path.basename(e)) for e in git_projects])
 
-        for p in sorted(git_projects):
-            print_git_status(p, 2 if args.status else longest, args.status, args.dirty_only)
+        for proj in sorted(git_projects):
+            padding = DEFAULT_PADDING if args.status else longest
+            print_git_status(proj, padding, args.status, args.dirty_only)
     else:
         sys.exit("No repositories found")
