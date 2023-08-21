@@ -22,7 +22,7 @@ def print_git_status(repo_path,
                      show_git_status=False,
                      show_dirty_only=False):
     """TODO"""
-    show_clean_repo = not show_dirty_only  # reversed flag for readability
+    show_clean_repo = not show_dirty_only  # reverse flag for readability
     base_name = os.path.basename(repo_path)
     repo = Repo(repo_path)
 
@@ -37,7 +37,7 @@ def print_git_status(repo_path,
         status_text = repo.git.status("--short")
 
         if status_text:
-            # show firty repos: modified & untracked files in status_text
+            # show dirty repos with modified & untracked files in status_text
             out = "\n".join(f"{padding_size * ' '}{line}" for line in status_text.split('\n'))
             print(f"{tmp}\n{out}\n")
         else:
