@@ -66,7 +66,7 @@ def _basename_lower(term: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Show git status for multiple repositories")
-    parser.add_argument("dirs", default=[os.getcwd()], nargs='+',
+    parser.add_argument("dirs", default=[os.getcwd()], nargs='*',
                         help="Set root search directories")
 
     parser.add_argument("-s", "--status", default=False, action="store_true",
