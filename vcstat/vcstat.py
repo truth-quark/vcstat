@@ -3,7 +3,7 @@
 import os
 import sys
 import argparse
-from git import Repo  # from 'GitPython' pkg
+import git  # GitPython package
 
 
 RED = "\033[0;31m"
@@ -20,7 +20,7 @@ GIT_DIR = ".git"
 # FIXME: change this to format_status() & return a string for printing
 # TODO: add bash colours to status output?
 # TODO: add flag to ignore untracked files?
-def print_git_status(repo,
+def print_git_status(repo: git.Repo,
                      padding_size=0,
                      show_git_status=False,
                      show_dirty_only=False):
@@ -59,7 +59,7 @@ def print_git_status(repo,
             print(pad * ' ', text)
 
 
-def _basename_lower(term: Repo):
+def _basename_lower(term: git.Repo):
     return os.path.basename(term.working_dir).lower()
 
 
@@ -85,7 +85,7 @@ if __name__ == "__main__":
         git_repos = []  # split printout of each dir
         for root, dirs, _ in os.walk(_dir):
             if GIT_DIR in dirs:
-                repo = Repo(root)
+                repo = git.Repo(root)
 
                 if repo.is_dirty() or args.dirty_only is False:
                     git_repos.append(repo)
