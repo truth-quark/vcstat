@@ -82,19 +82,19 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     for _dir in args.dirs:
-        git_projects = []  # split printout of each dir
+        git_repos = []  # split printout of each dir
         for root, dirs, _ in os.walk(_dir):
             if GIT_DIR in dirs:
                 repo = Repo(root)
 
                 if repo.is_dirty() or args.dirty_only is False:
-                    git_projects.append(repo)
+                    git_repos.append(repo)
 
-        if git_projects:
+        if git_repos:
             print(f'Git Repos {_dir}:')
-            longest = max([len(os.path.basename(repo.working_dir)) for repo in git_projects])
+            longest = max([len(os.path.basename(repo.working_dir)) for repo in git_repos])
 
-            for repo in sorted(git_projects, key=_basename_lower):
+            for repo in sorted(git_repos, key=_basename_lower):
                 padding = DEFAULT_PADDING if args.status else longest
                 print_git_status(repo, padding, args.status, args.dirty_only)
         else:
