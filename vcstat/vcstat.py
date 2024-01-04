@@ -76,19 +76,19 @@ if __name__ == "__main__":
                         help="Show only dirty/modified repos (inc untracked files)")
 
     args = parser.parse_args()
-    git_projects = []
 
     for _dir in args.dirs:
+        git_projects = []  # separate printout of each dir
         for root, dirs, _ in os.walk(_dir):
             if ".git" in dirs:
                 git_projects.append(root)
 
-    if git_projects:
-        print('Git:')
-        longest = max([len(os.path.basename(e)) for e in git_projects])
+        if git_projects:
+            print(f'Git Repos {_dir}:')
+            longest = max([len(os.path.basename(e)) for e in git_projects])
 
-        for proj in sorted(git_projects, key=_basename_lower):
-            padding = DEFAULT_PADDING if args.status else longest
-            print_git_status(proj, padding, args.status, args.dirty_only)
-    else:
-        sys.exit("No repositories found")
+            for proj in sorted(git_projects, key=_basename_lower):
+                padding = DEFAULT_PADDING if args.status else longest
+                print_git_status(proj, padding, args.status, args.dirty_only)
+        else:
+            sys.exit("No repositories found")
