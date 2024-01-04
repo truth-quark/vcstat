@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    for _dir in args.dirs:
+    for i, _dir in enumerate(args.dirs):
         git_repos = []  # split printout of each dir
         for root, dirs, _ in os.walk(_dir):
             if GIT_DIR in dirs:
@@ -91,7 +91,8 @@ if __name__ == "__main__":
                     git_repos.append(repo)
 
         if git_repos:
-            print(f'Git Repos {_dir}:')
+            spacer = "\n" if i else ""  # add newlines between repo groups per arg
+            print(f"{spacer}Git Repos {_dir}:")
             longest = max([len(os.path.basename(repo.working_dir)) for repo in git_repos])
 
             for repo in sorted(git_repos, key=_basename_lower):
