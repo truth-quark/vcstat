@@ -22,17 +22,14 @@ GIT_DIR = ".git"
 # TODO: add flag to ignore untracked files?
 def print_git_status(repo: git.Repo,
                      padding_size=0,
-                     show_git_status=False,
-                     show_dirty_only=False):
+                     show_git_status=False):
     """
     Print Git repository status to `stdout`.
 
     @param repo: git Repo object
     @param padding_size: number of spaces to indent the repository name
     @param show_git_status: True to list all modified and untracked files
-    @param show_dirty_only: True prevents display of unmodified repositories
     """
-    show_clean_repo = not show_dirty_only  # reverse flag for readability
     basename = os.path.basename(repo.working_dir)
 
     formatting = {"basename": basename,
@@ -50,13 +47,11 @@ def print_git_status(repo: git.Repo,
             out = "\n".join(f"{padding_size * ' '}{line}" for line in status_text.split('\n'))
             print(f"{text}\n{out}\n")
         else:
-            if show_clean_repo:
-                print(f"{text}\n")
+            print(f"{text}\n")
     else:
-        # ignore git status, show short form summary of repo status
-        if show_clean_repo or repo.is_dirty():
-            pad = (padding_size - len(basename))
-            print(pad * ' ', text)
+        # show 1 liner summary of repo status
+        pad = (padding_size - len(basename))
+        print(pad * ' ', text)
 
 
 def _basename_lower(term: git.Repo):
@@ -75,10 +70,10 @@ if __name__ == "__main__":
                         action="store_true",
                         help="Show git status for each repository")
 
-    parser.add_argument("-d", "--dirty-only",
+    parser.add_argument("-a", "--all",
                         default=False,
                         action="store_true",
-                        help="Show only dirty/modified repos (inc untracked files)")
+                        help="Show status of all clean & dirty repositories")
 
     args = parser.parse_args()
 
@@ -88,7 +83,8 @@ if __name__ == "__main__":
             if GIT_DIR in dirs:
                 repo = git.Repo(root)
 
-                if repo.is_dirty() or args.dirty_only is False:
+                # filter repos for inclusion
+                if repo.is_dirty() or args.all:
                     git_repos.append(repo)
 
         if git_repos:
@@ -98,6 +94,6 @@ if __name__ == "__main__":
 
             for repo in sorted(git_repos, key=_basename_lower):
                 padding = DEFAULT_PADDING if args.status else longest
-                print_git_status(repo, padding, args.status, args.dirty_only)
+                print_git_status(repo, padding, args.status)
         else:
             sys.exit("No repositories found")
