@@ -12,7 +12,7 @@ DEFAULT = "[0m"
 DIRTY = f"{RED}dirty\033{DEFAULT}"
 CLEAN = f"{GREEN}clean\033{DEFAULT}"
 
-STATUS_TEMPLATE = "\033[1;37m{basename}\033[0m ({dirty}) \033[0;33m{branch}\033[0m"
+STATUS_TEMPLATE = "\033[1;37m{basename}\033[0m ({dirty}) \033[0;33m{branch}\033[0m{comment}"
 DEFAULT_PADDING = 2
 GIT_DIR = ".git"
 
@@ -22,24 +22,26 @@ GIT_DIR = ".git"
 # TODO: add flag to ignore untracked files?
 def print_git_status(repo: git.Repo,
                      padding_size=0,
-                     show_git_status=False):
+                     show_git_status=False,
+                     show_untracked=False):
     """
     Print Git repository status to `stdout`.
 
     @param repo: git Repo object
     @param padding_size: number of spaces to indent the repository name
     @param show_git_status: True to list all modified and untracked files
+    @param show_untracked: True displays flag if untracked files in repository
     """
     basename = os.path.basename(repo.working_dir)
 
     formatting = {"basename": basename,
                   "dirty": DIRTY if repo.is_dirty() else CLEAN,
-                  'branch': repo.head.ref.name}
+                  "branch": repo.head.ref.name,
+                  "comment": " [+untracked]" if show_untracked and repo.untracked_files else ""}
 
     text = STATUS_TEMPLATE.format(**formatting)
 
-    if show_git_status:
-        # show more extended form output for 'git status'
+    if show_git_status:  # an extended form output for 'git status' option
         status_text = repo.git.status("--short")
 
         if status_text:
@@ -49,7 +51,7 @@ def print_git_status(repo: git.Repo,
         else:
             print(f"{text}\n")
     else:
-        # show 1 liner summary of repo status
+        # default: show 1 liner summary of repo status
         pad = (padding_size - len(basename))
         print(pad * ' ', text)
 
@@ -65,15 +67,20 @@ if __name__ == "__main__":
     parser.add_argument("dirs", default=[os.getcwd()], nargs='*',
                         help="Set root search directories")
 
+    parser.add_argument("-a", "--all",
+                        default=False,
+                        action="store_true",
+                        help="Show status of all clean & dirty repositories")
+
     parser.add_argument("-s", "--status",
                         default=False,
                         action="store_true",
                         help="Show git status for each repository")
 
-    parser.add_argument("-a", "--all",
+    parser.add_argument("-u", "--untracked",
                         default=False,
                         action="store_true",
-                        help="Show status of all clean & dirty repositories")
+                        help="Indicate repositories with untracked files")
 
     args = parser.parse_args()
 
@@ -94,6 +101,6 @@ if __name__ == "__main__":
 
             for repo in sorted(git_repos, key=_basename_lower):
                 padding = DEFAULT_PADDING if args.status else longest
-                print_git_status(repo, padding, args.status)
+                print_git_status(repo, padding, args.status, args.untracked)
         else:
             sys.exit("No repositories found")
