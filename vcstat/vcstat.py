@@ -64,6 +64,7 @@ def _basename_lower(term: git.Repo):
 
 
 if __name__ == "__main__":
+    # TODO: add prefix/postfix text
     desc = "Show git status for multiple repositories"
     parser = argparse.ArgumentParser(description=desc)
     parser.add_argument("dirs", default=[os.getcwd()], nargs='*',
@@ -72,7 +73,7 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--status",
                         default=False,
                         action="store_true",
-                        help="Show git status")
+                        help="Show git status for each repository")
 
     parser.add_argument("-d", "--dirty-only",
                         default=False,
