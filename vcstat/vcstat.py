@@ -80,7 +80,9 @@ if __name__ == "__main__":
     parser.add_argument("-u", "--untracked",
                         default=False,
                         action="store_true",
-                        help="Indicate repositories with untracked files")
+                        help="""Alert repositories with untracked files. Clean
+                            repositiories with untracked files are treated as
+                            modified & included in the short form output.""")
 
     args = parser.parse_args()
 
@@ -91,7 +93,7 @@ if __name__ == "__main__":
                 repo = git.Repo(root)
 
                 # filter repos for inclusion
-                if repo.is_dirty() or args.all:
+                if repo.is_dirty() or args.all or (args.untracked and repo.untracked_files):
                     git_repos.append(repo)
 
         if git_repos:
