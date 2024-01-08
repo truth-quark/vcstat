@@ -61,9 +61,10 @@ def _basename_lower(term: git.Repo):
 
 
 if __name__ == "__main__":
-    # TODO: add prefix/postfix text
-    desc = "Show git status for multiple repositories"
+    desc = """Show git status for multiple repositories. Given one or more dirs,
+           vcstat searches for git repositories, listing the git status of each."""
     parser = argparse.ArgumentParser(description=desc)
+
     parser.add_argument("dirs", default=[os.getcwd()], nargs='*',
                         help="Set root search directories")
 
@@ -75,13 +76,13 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--status",
                         default=False,
                         action="store_true",
-                        help="Show git status for each repository")
+                        help="Show longer form git status for each repository")
 
     parser.add_argument("-u", "--untracked",
                         default=False,
                         action="store_true",
                         help="""Alert repositories with untracked files. Clean
-                            repositiories with untracked files are treated as
+                            repositories with untracked files are treated as
                             modified & included in the short form output.""")
 
     args = parser.parse_args()
