@@ -33,11 +33,13 @@ def print_git_status(repo: git.Repo,
     @param show_untracked: True displays flag if untracked files in repository
     """
     basename = os.path.basename(repo.working_dir)
+    n_untrack = len(repo.untracked_files)
+    desc = f" [+{n_untrack} untracked]" if show_untracked and repo.untracked_files else ""
 
     formatting = {"basename": basename,
                   "dirty": DIRTY if repo.is_dirty() else CLEAN,
                   "branch": repo.head.ref.name,
-                  "comment": " [+untracked]" if show_untracked and repo.untracked_files else ""}
+                  "comment": desc}
 
     text = STATUS_TEMPLATE.format(**formatting)
 
