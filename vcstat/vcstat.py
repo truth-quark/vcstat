@@ -12,20 +12,17 @@ DEFAULT = "[0m"
 DIRTY = f"{RED}dirty\033{DEFAULT}"
 CLEAN = f"{GREEN}clean\033{DEFAULT}"
 
-STATUS_TEMPLATE = "\033[1;37m{basename}\033[0m ({dirty}) \033[0;33m{branch}\033[0m{comment}"
 DEFAULT_PADDING = 2
 GIT_DIR = ".git"
 
 
-# FIXME: change this to format_status() & return a string for printing
 # TODO: add bash colours to status output?
-# TODO: add flag to ignore untracked files?
-def print_git_status(repo: git.Repo,
-                     padding_size=0,
-                     show_git_status=False,
-                     show_untracked=False):
+def get_git_status(repo: git.Repo,
+                   padding_size=0,
+                   show_git_status=False,
+                   show_untracked=False):
     """
-    Print Git repository status to `stdout`.
+    Returns Git repository status report.
 
     @param repo: git Repo object
     @param padding_size: number of spaces to indent the repository name
@@ -33,29 +30,25 @@ def print_git_status(repo: git.Repo,
     @param show_untracked: True displays flag if untracked files in repository
     """
     basename = os.path.basename(repo.working_dir)
-    n_untrack = len(repo.untracked_files)
-    desc = f" [+{n_untrack} untracked]" if show_untracked and repo.untracked_files else ""
+    n_untracked = len(repo.untracked_files)
+    comment = f" [+{n_untracked} untracked]" if show_untracked and repo.untracked_files else ""
+    dirty = DIRTY if repo.is_dirty() else CLEAN
+    branch = repo.head.ref.name
+    text = f"\033[1;37m{basename}\033[0m ({dirty}) \033[0;33m{branch}\033[0m{comment}"
 
-    formatting = {"basename": basename,
-                  "dirty": DIRTY if repo.is_dirty() else CLEAN,
-                  "branch": repo.head.ref.name,
-                  "comment": desc}
+    if show_git_status:
+        # an extended form output for 'git status' option
+        status = repo.git.status("--short")
+        lines = ""
 
-    text = STATUS_TEMPLATE.format(**formatting)
+        if status:
+            # show dirty repos & list modified & untracked files
+            lines = "\n".join(f"{padding_size * ' '}{line}" for line in status.split("\n"))
+        return f"{text}\n{lines}\n"
 
-    if show_git_status:  # an extended form output for 'git status' option
-        status_text = repo.git.status("--short")
-
-        if status_text:
-            # show dirty repos with modified & untracked files in status_text
-            out = "\n".join(f"{padding_size * ' '}{line}" for line in status_text.split('\n'))
-            print(f"{text}\n{out}\n")
-        else:
-            print(f"{text}\n")
-    else:
-        # default: show 1 liner summary of repo status
-        pad = (padding_size - len(basename))
-        print(pad * ' ', text)
+    # default: show 1 liner summary of repo status
+    pad = padding_size - len(basename)
+    return f"{pad * ' '} {text}"
 
 
 def _basename_lower(term: git.Repo):
@@ -106,6 +99,6 @@ if __name__ == "__main__":
 
             for repo in sorted(git_repos, key=_basename_lower):
                 padding = DEFAULT_PADDING if args.status else longest
-                print_git_status(repo, padding, args.status, args.untracked)
+                print(get_git_status(repo, padding, args.status, args.untracked))
         else:
             sys.exit("No repositories found")
