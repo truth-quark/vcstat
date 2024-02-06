@@ -51,8 +51,8 @@ def get_git_status(repo: git.Repo,
     return f"{pad * ' '} {text}"
 
 
-def _basename_lower(term: git.Repo):
-    return os.path.basename(term.working_dir).lower()
+def _basename_lower(repo: git.Repo):
+    return os.path.basename(repo.working_dir).lower()
 
 
 if __name__ == "__main__":
