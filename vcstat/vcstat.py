@@ -55,6 +55,13 @@ def _basename_lower(repo: git.Repo):
     return os.path.basename(repo.working_dir).lower()
 
 
+def repos(_dir):
+    """Yields repos from recursive directory scan."""
+    for root, dirs, _ in os.walk(_dir):
+        if GIT_DIR in dirs:
+            yield git.Repo(root)
+
+
 if __name__ == "__main__":
     desc = """Show git status for multiple repositories. Given one or more dirs,
            vcstat searches for git repositories, listing the git status of each."""
@@ -82,23 +89,19 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    for i, _dir in enumerate(args.dirs):
-        git_repos = []  # split printout of each dir
-        for root, dirs, _ in os.walk(_dir):
-            if GIT_DIR in dirs:
-                repo = git.Repo(root)
+    def is_required(args, repo):
+        return repo.is_dirty() or args.all or (args.untracked and repo.untracked_files)
 
-                # filter repos for inclusion
-                if repo.is_dirty() or args.all or (args.untracked and repo.untracked_files):
-                    git_repos.append(repo)
+    for i, _dir in enumerate(args.dirs):
+        git_repos = [r for r in repos(_dir) if is_required(args, r)]
 
         if git_repos:
-            spacer = "\n" if i else ""  # add newlines between repo groups per arg
+            spacer = "\n" if i else ""  # add newlines between repo text for each dir
             print(f"{spacer}Git Repos {_dir}:")
-            longest = max([len(os.path.basename(repo.working_dir)) for repo in git_repos])
+            longest = max([len(os.path.basename(r.working_dir)) for r in git_repos])
 
-            for repo in sorted(git_repos, key=_basename_lower):
+            for r in sorted(git_repos, key=_basename_lower):
                 padding = DEFAULT_PADDING if args.status else longest
-                print(get_git_status(repo, padding, args.status, args.untracked))
+                print(get_git_status(r, padding, args.status, args.untracked))
         else:
             sys.exit("No repositories found")
