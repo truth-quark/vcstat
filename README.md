@@ -1,3 +1,3 @@
 # Version Control Status
 
-The `vcstat` utility is designed for performing project directory wide statuses of one of more version control repositories. If you have multiple repos under development, `vcstat` provides an efficient means to perform a `status` (e.g. `git status`) across multiple directories to outline outstanding changes.
+`vcstat` is designed to perform multiple project directory statuses of git version controlled repositories. If you have multiple repositories under development, `vcstat` provides an convenient means to perform `git status` across multiple directories & summarise outstanding changes.
