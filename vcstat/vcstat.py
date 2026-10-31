@@ -43,7 +43,8 @@ def get_git_status(repo: git.Repo,
 
         if status:
             # show dirty repos & list modified & untracked files
-            lines = "\n".join(f"{padding_size * ' '}{line}" for line in status.split("\n"))
+            padding = padding_size * ' '
+            lines = "\n".join(f"{padding}{line}" for line in status.split("\n"))
         return f"{text}\n{lines}\n"
 
     # default: show 1 liner summary of repo status
