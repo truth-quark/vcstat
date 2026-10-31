@@ -94,6 +94,7 @@ if __name__ == "__main__":
 
     for i, _dir in enumerate(args.dirs):
         git_repos = [r for r in repos(_dir) if is_required(args, r)]
+        problem_repos = []
 
         if git_repos:
             spacer = "\n" if i else ""  # add newlines between repo text for each dir
@@ -101,7 +102,17 @@ if __name__ == "__main__":
             longest = max([len(os.path.basename(r.working_dir)) for r in git_repos])
 
             for r in sorted(git_repos, key=_basename_lower):
-                padding = DEFAULT_PADDING if args.status else longest
-                print(get_git_status(r, padding, args.status, args.untracked))
+                try:
+                    padding = DEFAULT_PADDING if args.status else longest
+                    print(get_git_status(r, padding, args.status, args.untracked))
+                except:
+                    problem_repos.append(r)
+
+            # NB: only appears in --all mode
+            if problem_repos:
+                print("\nProblem Repos:")
+
+                for r in problem_repos:
+                    print(r.working_dir)
         else:
             sys.exit("No repositories found")
